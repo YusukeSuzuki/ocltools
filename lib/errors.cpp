@@ -79,10 +79,10 @@ static const std::map<int, std::string>::value_type iErrorMessages[] =
 	iMAP_ELEM(CL_INVALID_PROPERTY),
 };
 
-static const size_t ErrorMessageMapSize =
+static const size_t iErrorMessageMapSize =
 	sizeof(iErrorMessages) / sizeof(iErrorMessages[0]);
 const std::map<int, std::string> ErrorMessageMap(
-	iErrorMessages, iErrorMessages + ErrorMessageMapSize);
+	iErrorMessages, iErrorMessages + iErrorMessageMapSize);
 
 }
 
