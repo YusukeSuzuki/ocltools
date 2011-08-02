@@ -1,0 +1,6 @@
+oclq:
+Query informations about OpenCL platfroms and devices.
+
+oclc:
+OpenCL compiler frontend.
+
