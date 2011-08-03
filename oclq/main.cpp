@@ -18,11 +18,19 @@
 #include "errors.hpp"
 #include "names.hpp"
 
-#include <CL/cl.h>
+#if !APPLE
+	#include <CL/cl.h>
+#else
+	#include <OpenCL/opencl.h>
+#endif
 
 #include <iostream>
 #include <string>
 #include <vector>
+#include <getopt.h>
+
+static const int gVersionMajor = 1;
+static const int gVersionMinor = 0;
 
 static void IfErrorThenExit(int error);
 
@@ -39,11 +47,35 @@ static std::string GetDeviceInfo(cl_device_id device_id, cl_device_info info);
 static void PrintPlatform(cl_platform_id platform_id, bool verbose);
 static void PrintDevice(cl_platform_id platform_id, cl_device_id device_id, bool verbose);
 
+static void GetOpts(
+	int argc, char* argv[], bool& verbose, bool& version, bool& help);
+
 int
 main(int argc, char* argv[])
 {
 	using namespace std;
 	using namespace OCLT;
+
+	bool verbose = false;
+	bool version = false;
+	bool help = false;
+
+	GetOpts(argc, argv, verbose, version, help);
+
+	if(help)
+	{
+		cout << "usage: " << argv[0] << " [options]" << endl <<
+			"  -v --verbose print detail" << endl <<
+			"  -h --help    print help" << endl <<
+			"  -V --version print version information" << endl;
+		exit(EXIT_SUCCESS);
+	}
+
+	if(version)
+	{
+		cout << "oclq version " << gVersionMajor << "." << gVersionMinor << endl;
+		exit(EXIT_SUCCESS);
+	}
 
 	cl_uint num_platforms;
 
@@ -61,7 +93,7 @@ main(int argc, char* argv[])
 
 	for(cl_uint i = 0; i < num_platforms; ++i)
 	{
-		PrintPlatform(platforms[i], true);
+		PrintPlatform(platforms[i], verbose);
 
 		cl_uint device_num = 0;
 
@@ -80,7 +112,7 @@ main(int argc, char* argv[])
 
 		for(size_t j = 0; j < device_num; ++j)
 		{
-			PrintDevice(platforms[i], devices[j], true);
+			PrintDevice(platforms[i], devices[j], verbose);
 		}
 
 		delete[] devices;
@@ -419,4 +451,43 @@ static void IfErrorThenExit(int error)
 
 	exit(EXIT_FAILURE);
 }
+
+static void GetOpts(
+	int argc, char* argv[], bool& verbose, bool& version, bool& help)
+{
+	verbose = false;
+	version = false;
+	help = false;
+
+	for(;;)
+	{
+		static struct option long_options[] = {
+			{"help", 0, 0, 'h'},
+			{"verbose", 0, 0, 'v'},
+			{"version", 0, 0, 'V'},
+			{0,0,0,0}
+		};
+
+		int option_index = 0;
+		int c = getopt_long(argc, argv, "hvV", long_options, &option_index);
+
+		if(c == -1) break;
+
+		switch(c)
+		{
+		case 'h':
+			help = true;
+			break;
+		case 'v':
+			verbose = true;
+			break;
+		case 'V':
+			version = true;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
 

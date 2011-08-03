@@ -18,7 +18,11 @@
 #ifndef OCLC_NAMES_HPP_
 #define OCLC_NAMES_HPP_
 
-#include <CL/cl.h>
+#if !APPLE
+	#include <CL/cl.h>
+#else
+	#include <OpenCL/opencl.h>
+#endif
 
 #include <map>
 #include <string>

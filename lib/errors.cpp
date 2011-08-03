@@ -17,7 +17,11 @@
  */
 #include "errors.hpp"
 
-#include <CL/cl.h>
+#if !APPLE
+	#include <CL/cl.h>
+#else
+	#include <OpenCL/opencl.h>
+#endif
 
 namespace OCLT
 {
