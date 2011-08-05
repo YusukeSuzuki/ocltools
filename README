@@ -1,8 +1,14 @@
 oclq:
-Query informations about OpenCL platfroms and devices.
-(currently work well)
+Query informations about OpenCL platfroms and devices. (work well)
 
 oclc:
-OpenCL compiler frontend.
-(under working)
+OpenCL compiler frontend. (under developint)
+	usage
+		oclc -o kernel.clx kernel.cl
+
+	limitation
+	- wrong help message
+	- can only save program binary for first found platform and first found device
+	- can't pass compiler options
+	- and many
 
