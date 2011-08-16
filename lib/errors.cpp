@@ -23,6 +23,10 @@
 	#include <OpenCL/opencl.h>
 #endif
 
+#ifndef CL_INVALID_PROPERTY                         
+	#define CL_INVALID_PROPERTY                         -64
+#endif
+
 namespace OCLT
 {
 
