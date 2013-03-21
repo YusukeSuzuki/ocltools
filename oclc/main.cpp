@@ -94,6 +94,7 @@ main(int argc, char* argv[])
 	}
 
 	vector<unsigned char> binary;
+
 	BuildProgram(sources, binary);
 
 	if( outfile.empty() ) outfile = "out.clx";
@@ -186,9 +187,28 @@ static void BuildProgram(
 			context, sources.size(), &srcPtrs[0], &srcSizes[0], &errcode_ret);
 	IfErrorThenExit(errcode_ret);
 
-	IfErrorThenExit( clBuildProgram(program, 0, NULL, NULL, NULL, NULL) );
+	if(int err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL) )
+	{
+		size_t log_size = 0;
+		IfErrorThenExit( clGetProgramBuildInfo(
+			program, device_ids[0], CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size) );
+
+		vector<char> build_log(log_size);
+
+		IfErrorThenExit( clGetProgramBuildInfo(
+			program, device_ids[0], CL_PROGRAM_BUILD_LOG, log_size, &build_log[0], NULL) );
+
+		cout << string(&build_log[0], log_size) << endl;
+
+
+		clReleaseContext(context);
+
+		IfErrorThenExit( err );
+		return;
+	}
 
 	cl_uint num_program_devices;
+
 	IfErrorThenExit(
 		clGetProgramInfo(
 			program, CL_PROGRAM_NUM_DEVICES, sizeof(num_program_devices),
@@ -259,6 +279,8 @@ static void IfErrorThenExit(int error)
 	{
 		std::cerr << "error : unkown error" << std::endl;
 	}
+
+	clUnloadCompiler();
 
 	exit(EXIT_FAILURE);
 }
